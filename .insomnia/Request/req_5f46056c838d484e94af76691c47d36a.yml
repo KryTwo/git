@@ -1,9 +1,9 @@
 _id: req_5f46056c838d484e94af76691c47d36a
 type: Request
 parentId: wrk_3744590f7c1c4f5fba8c6ed1de5950ff
-modified: 1648454351301
+modified: 1648498806264
 created: 1648453348994
-url: localhost:8989/peoples/
+url: localhost:8989/peoples/add
 name: PostPeople
 description: ""
 method: POST
@@ -11,10 +11,10 @@ body:
   mimeType: application/json
   text: |-
     {
-    		"last_name": "Pronin",
-    		"first_name": "Yakov",
-    		"middle_name": "Borisovich",
-    		"address": "Tula"
+    		"last_name": "Yakovlev",
+    		"first_name": "Denis",
+    		"middle_name": "Mikhailovich",
+    		"address": "Odessa"
     	}
 parameters: []
 headers:

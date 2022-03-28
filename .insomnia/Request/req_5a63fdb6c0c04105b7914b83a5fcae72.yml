@@ -1,9 +1,9 @@
 _id: req_5a63fdb6c0c04105b7914b83a5fcae72
 type: Request
 parentId: wrk_3744590f7c1c4f5fba8c6ed1de5950ff
-modified: 1648454094384
+modified: 1648493658109
 created: 1648454061199
-url: localhost:8989/peoples/39
+url: localhost:8989/peoples/65
 name: Delete people
 description: ""
 method: DELETE

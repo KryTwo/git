@@ -1,7 +1,7 @@
 _id: req_810d224c5a2046d1ae71973ad1794354
 type: Request
 parentId: wrk_3744590f7c1c4f5fba8c6ed1de5950ff
-modified: 1648455471345
+modified: 1648497988519
 created: 1648264247264
 url: localhost:8989/peoples/
 name: GetAllPeople
@@ -19,7 +19,7 @@ body:
     	},
     	"sorts":{
     		"sort":"id",
-    		"way":"+"
+    		"way":"-"
     	}
     }
 parameters: []

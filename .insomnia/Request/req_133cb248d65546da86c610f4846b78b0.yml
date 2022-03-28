@@ -1,0 +1,30 @@
+_id: req_133cb248d65546da86c610f4846b78b0
+type: Request
+parentId: wrk_3744590f7c1c4f5fba8c6ed1de5950ff
+modified: 1648454353083
+created: 1648453668892
+url: localhost:8989/peoples/
+name: Modify People
+description: ""
+method: PUT
+body:
+  mimeType: application/json
+  text: |-
+    {
+    	"id":"2",
+    	"address":"Minsk"
+    }
+parameters: []
+headers:
+  - name: Content-Type
+    value: application/json
+    id: pair_bdd86f60c7cd4d4cb842a170a9ec1f6a
+authentication: {}
+metaSortKey: -1648453668892
+isPrivate: false
+settingStoreCookies: true
+settingSendCookies: true
+settingDisableRenderRequestBody: false
+settingEncodeUrl: true
+settingRebuildPath: true
+settingFollowRedirects: global

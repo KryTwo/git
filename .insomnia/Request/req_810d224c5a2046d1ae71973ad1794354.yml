@@ -1,0 +1,38 @@
+_id: req_810d224c5a2046d1ae71973ad1794354
+type: Request
+parentId: wrk_3744590f7c1c4f5fba8c6ed1de5950ff
+modified: 1648455471345
+created: 1648264247264
+url: localhost:8989/peoples/
+name: GetAllPeople
+description: ""
+method: GET
+body:
+  mimeType: application/json
+  text: |-
+    {
+    	"page":1,
+    	"perPage":5,
+    	"filters":{
+    		"column":"",
+    		"value":""
+    	},
+    	"sorts":{
+    		"sort":"id",
+    		"way":"+"
+    	}
+    }
+parameters: []
+headers:
+  - name: Content-Type
+    value: application/json
+    id: pair_57b72c8ff2ef4053be4009fd71437b40
+authentication: {}
+metaSortKey: -1648264247264
+isPrivate: false
+settingStoreCookies: true
+settingSendCookies: true
+settingDisableRenderRequestBody: false
+settingEncodeUrl: true
+settingRebuildPath: true
+settingFollowRedirects: global

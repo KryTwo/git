@@ -1,0 +1,26 @@
+_id: req_5a63fdb6c0c04105b7914b83a5fcae72
+type: Request
+parentId: wrk_3744590f7c1c4f5fba8c6ed1de5950ff
+modified: 1648454094384
+created: 1648454061199
+url: localhost:8989/peoples/39
+name: Delete people
+description: ""
+method: DELETE
+body:
+  mimeType: application/json
+  text: ""
+parameters: []
+headers:
+  - name: Content-Type
+    value: application/json
+    id: pair_a70d33bda1e847109389ba3b7bbde1ff
+authentication: {}
+metaSortKey: -1648454061199
+isPrivate: false
+settingStoreCookies: true
+settingSendCookies: true
+settingDisableRenderRequestBody: false
+settingEncodeUrl: true
+settingRebuildPath: true
+settingFollowRedirects: global

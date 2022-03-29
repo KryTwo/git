@@ -1,9 +1,9 @@
 _id: req_133cb248d65546da86c610f4846b78b0
 type: Request
 parentId: wrk_3744590f7c1c4f5fba8c6ed1de5950ff
-modified: 1648493685843
+modified: 1648521681795
 created: 1648453668892
-url: localhost:8989/peoples/
+url: localhost:8888/peoples/
 name: Modify People
 description: ""
 method: PUT
@@ -11,8 +11,11 @@ body:
   mimeType: application/json
   text: |-
     {
-    	"id":"2",
-    	"address":"Minsk"
+      "id": "2",
+    	"address": "dsa",
+      "first_name": "Evgenij",
+      "last_name": "",
+      "middle_name": "Alexandrovich"
     }
 parameters: []
 headers:

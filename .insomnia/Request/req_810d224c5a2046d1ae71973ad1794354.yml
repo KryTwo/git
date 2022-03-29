@@ -1,12 +1,12 @@
 _id: req_810d224c5a2046d1ae71973ad1794354
 type: Request
 parentId: wrk_3744590f7c1c4f5fba8c6ed1de5950ff
-modified: 1648497988519
+modified: 1648521676559
 created: 1648264247264
-url: localhost:8989/peoples/
+url: localhost:8888/peoples
 name: GetAllPeople
 description: ""
-method: GET
+method: POST
 body:
   mimeType: application/json
   text: |-
@@ -14,12 +14,12 @@ body:
     	"page":1,
     	"perPage":5,
     	"filters":{
-    		"column":"",
-    		"value":""
+    		"column":"p.id",
+    		"value":"2"
     	},
     	"sorts":{
-    		"sort":"id",
-    		"way":"-"
+    		"sort":"",
+    		"way":""
     	}
     }
 parameters: []

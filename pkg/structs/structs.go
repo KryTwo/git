@@ -1,26 +1,26 @@
 package structs
 
 type Search struct {
-	Page    int     `json:"page"`
-	PerPage int     `json:"perPage"`
+	Page    int     `json:"page" swaggertype:"integer" example:"1"`
+	PerPage int     `json:"perPage" swaggertype:"integer" example:"5"`
 	Filters Filters `json:"filters"`
 	Sorts   Sorts   `json:"sorts"`
 }
 
 type Filters struct {
-	Column string `json:"column"`
-	Value  string `json:"value"`
+	Column string `json:"column" swaggertype:"string" example:"last_name"`
+	Value  string `json:"value" swaggertype:"string" example:"Pushkin"`
 }
 
 type Sorts struct {
-	Sort string `json:"sort"`
-	Way  string `json:"way"`
+	Sort string `json:"sort" swaggertype:"string" example:"p.last_name"`
+	Way  string `json:"way" swaggertype:"string" example:"+"`
 }
 
 type People struct {
-	ID          string `json:"id"`
-	Last_name   string `json:"last_name"`
-	First_name  string `json:"first_name"`
-	Middle_name string `json:"middle_name"`
-	Address     string `json:"address"`
+	ID          string `json:"id" swaggertype:"string" `
+	Last_name   string `json:"last_name" swaggertype:"string" example:"Kolosov"`
+	First_name  string `json:"first_name" swaggertype:"string" example:"Evgenij"`
+	Middle_name string `json:"middle_name" swaggertype:"string" example:"Alexandrovich"`
+	Address     string `json:"address" swaggertype:"string" example:"Moscow"`
 }

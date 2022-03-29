@@ -12,6 +12,16 @@ import (
 	"net/http"
 )
 
+// GetPeoples godoc
+// @Summary      Show all people
+// @Tags Peoples
+// @Description  Show people with sorting and filtering
+// @Accept json
+// @Produce json
+// @Param input body structs.Search true "search val"
+// @Success 200 {array} structs.People
+// @failure 400 {string} string "error"
+// @Router /peoples [post]
 func GetPeoples(ctx *gin.Context) {
 
 	var json structs.Search
@@ -101,6 +111,15 @@ func GetPeoples(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, lists)
 }
 
+// GetPeoplesById godoc
+// @Summary      Show People By ID
+// @Tags Peoples
+// @Description  Show One People
+// @Produce json
+// @Param people_id path int true "people_id"
+// @Success 200 {object} structs.People
+// @failure 400 {string} string "error"
+// @Router /peoples/{people_id} [post]
 func GetPeoplesById(ctx *gin.Context) {
 	id := ctx.Param("id")
 
@@ -153,6 +172,16 @@ func GetPeoplesById(ctx *gin.Context) {
 
 }
 
+// PostPeoples godoc
+// @Summary      Add People
+// @Tags Peoples
+// @Description  Add one people
+// @Accept json
+// @Produce json
+// @Param input body structs.People true "post values"
+// @Success 200 {object} structs.People{last_name=string,first_name=string,middle_name=string}
+// @failure 400 {string} string "error"
+// @Router /peoples/add [post]
 func PostPeoples(ctx *gin.Context) {
 	var newPeople structs.People
 	err := ctx.BindJSON(&newPeople)
@@ -179,32 +208,76 @@ func PostPeoples(ctx *gin.Context) {
 		}
 	}()
 
-	//GetPeoples(ctx)
-	ctx.IndentedJSON(http.StatusCreated, gin.H{"message": "people is added"})
+	ctx.IndentedJSON(http.StatusCreated, newPeople)
 }
 
+// ModifyPeoples godoc
+// @Summary      Change Address
+// @Tags Peoples
+// @Description  Add one people
+// @Accept json
+// @Produce json
+// @Param input body structs.People true "post values"
+// @Success 200 {object} structs.People{last_name=string,first_name=string,middle_name=string}
+// @failure 400 {string} string "error"
+// @Router /peoples [put]
 func ModifyPeoples(ctx *gin.Context) {
-	var changePeopleAddress structs.People
-	err := ctx.BindJSON(&changePeopleAddress)
+	var modifyPeople structs.People
+	err := ctx.BindJSON(&modifyPeople)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 
-	id := changePeopleAddress.ID
-	newAddress := changePeopleAddress.Address
+	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
+	var builder squirrel.UpdateBuilder
 
-	modifyRegistry := "UPDATE registry r SET address = $1 WHERE people_id = $2;"
-	func() {
-		_, err := postgres.Db.Query(modifyRegistry, newAddress, id)
+	// update table Registry, if address in request JSON body not nil
+	if modifyPeople.Address != "" {
+		builder = psql.Update("registry").
+			Set("address", modifyPeople.Address).
+			Where("people_id = ?")
+		req, _, err := builder.ToSql()
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
+			return
+		}
+		func() {
+			_, err := postgres.Db.Query(req, modifyPeople.Address, modifyPeople.ID)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+		}()
+	}
+
+	builder = psql.Update("people")
+	args := []string{modifyPeople.Last_name, modifyPeople.Middle_name}
+	if modifyPeople.Last_name != "" {
+		builder = builder.Set("last_name", modifyPeople.Last_name)
+	}
+
+	if modifyPeople.First_name != "" {
+		builder = builder.Set("first_name", modifyPeople.First_name)
+	}
+
+	if modifyPeople.Middle_name != "" {
+		builder = builder.Set("middle_name", modifyPeople.Middle_name)
+	}
+
+	builder = builder.Where(squirrel.Eq{"id": modifyPeople.ID})
+
+	req, _, err := builder.ToSql()
+	func() {
+		_, err := postgres.Db.Query(req, args, modifyPeople.ID)
+		if err != nil {
+			fmt.Println(err)
 			return
 		}
 	}()
 
 	//GetPeoples(ctx)
-	ctx.IndentedJSON(http.StatusOK, gin.H{"message": "Address for people_id: " + id + " successfully changed"})
+	//ctx.IndentedJSON(http.StatusOK, gin.H{"message": "Address for people_id: " + id + " successfully changed"})
 
 }
 

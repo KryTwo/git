@@ -1,0 +1,271 @@
+basePath: /
+definitions:
+  handlers.errorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  structs.Filters:
+    properties:
+      column:
+        example: last_name
+        type: string
+      value:
+        example: Pushkin
+        type: string
+    type: object
+  structs.People:
+    properties:
+      address:
+        example: Moscow
+        type: string
+      first_name:
+        example: Evgenij
+        type: string
+      id:
+        type: string
+      last_name:
+        example: Kolosov
+        type: string
+      middle_name:
+        example: Alexandrovich
+        type: string
+    type: object
+  structs.PeopleToAdd:
+    properties:
+      address:
+        example: Moscow
+        type: string
+      first_name:
+        example: Evgenij
+        type: string
+      last_name:
+        example: Kolosov
+        type: string
+      middle_name:
+        example: Alexandrovich
+        type: string
+    type: object
+  structs.Search:
+    properties:
+      filters:
+        $ref: '#/definitions/structs.Filters'
+      page:
+        example: 1
+        type: integer
+      perPage:
+        example: 5
+        type: integer
+      sorts:
+        $ref: '#/definitions/structs.Sorts'
+    type: object
+  structs.Sorts:
+    properties:
+      sort:
+        example: p.last_name
+        type: string
+      way:
+        example: +
+        type: string
+    type: object
+host: localhost:8888
+info:
+  contact: {}
+  description: This is a piece of shit.
+  title: CRUD web Server
+  version: "1.0"
+paths:
+  /peoples:
+    post:
+      consumes:
+      - application/json
+      description: Show people with sorting and filtering
+      parameters:
+      - description: search val
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/structs.Search'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/structs.People'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
+      summary: Show all people
+      tags:
+      - Peoples
+    put:
+      consumes:
+      - application/json
+      description: Modify People
+      parameters:
+      - description: post values
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/structs.People'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/structs.People'
+            - properties:
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                middle_name:
+                  type: string
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
+      summary: Modify People
+      tags:
+      - Peoples
+  /peoples/{people_id}:
+    delete:
+      description: DeletePeoplesById
+      parameters:
+      - description: people_id
+        in: path
+        name: people_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: people is delete
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
+      summary: DeletePeoplesById
+      tags:
+      - Peoples
+    post:
+      description: Show One People
+      parameters:
+      - description: people_id
+        in: path
+        name: people_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.People'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
+      summary: Show People By ID
+      tags:
+      - Peoples
+  /peoples/add:
+    post:
+      consumes:
+      - application/json
+      description: Add one people
+      parameters:
+      - description: post values
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/structs.PeopleToAdd'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/structs.PeopleToAdd'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
+      summary: Add People
+      tags:
+      - Peoples
+swagger: "2.0"

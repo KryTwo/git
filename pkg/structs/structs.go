@@ -24,3 +24,10 @@ type People struct {
 	Middle_name string `json:"middle_name" swaggertype:"string" example:"Alexandrovich"`
 	Address     string `json:"address" swaggertype:"string" example:"Moscow"`
 }
+
+type PeopleToAdd struct {
+	Last_name   string `json:"last_name" swaggertype:"string" example:"Kolosov"`
+	First_name  string `json:"first_name" swaggertype:"string" example:"Evgenij"`
+	Middle_name string `json:"middle_name" swaggertype:"string" example:"Alexandrovich"`
+	Address     string `json:"address" swaggertype:"string" example:"Moscow"`
+}

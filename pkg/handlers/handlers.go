@@ -10,6 +10,7 @@ import (
 	"log"
 	"math"
 	"net/http"
+	"strconv"
 )
 
 // GetPeoples godoc
@@ -20,14 +21,17 @@ import (
 // @Produce json
 // @Param input body structs.Search true "search val"
 // @Success 200 {array} structs.People
-// @failure 400 {string} string "error"
+// @Failure 400,404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
 // @Router /peoples [post]
 func GetPeoples(ctx *gin.Context) {
 
 	var json structs.Search
 	err := ctx.BindJSON(&json)
 	if err != nil {
-		log.Fatal(err)
+		newErrorResponse(ctx, http.StatusBadRequest, err.Error())
+		return
 	}
 
 	var lists []structs.People
@@ -46,7 +50,12 @@ func GetPeoples(ctx *gin.Context) {
 	}
 
 	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
-	builder := psql.Select("p.id", "p.last_name", "p.first_name", "p.middle_name", "r.address").
+	builder := psql.Select(
+		"p.id",
+		"p.last_name",
+		"p.first_name",
+		"p.middle_name",
+		"r.address").
 		From("People as p").
 		Join("registry as r on r.people_id = p.id")
 
@@ -71,7 +80,6 @@ func GetPeoples(ctx *gin.Context) {
 	//filtering
 	if filterColumn != "" {
 		builder = builder.Where(squirrel.Eq{filterColumn: filterValue})
-
 	}
 
 	req, _, err := builder.ToSql()
@@ -82,16 +90,16 @@ func GetPeoples(ctx *gin.Context) {
 
 	}
 	var rows *sql.Rows
+
 	if filterColumn != "" {
-		rows, _ = postgres.Db.Query(req, filterValue)
+		rows, err = postgres.Db.Query(req, filterValue)
 	} else {
-		rows, _ = postgres.Db.Query(req)
+		rows, err = postgres.Db.Query(req)
 	}
 
 	if err != nil {
-		fmt.Printf("%s, rows\n", err)
+		newErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
-
 	}
 
 	defer func() {
@@ -108,6 +116,11 @@ func GetPeoples(ctx *gin.Context) {
 		lists = append(lists, list)
 	}
 
+	if lists == nil {
+		ctx.IndentedJSON(http.StatusNotFound, gin.H{"message": "Not found"})
+		return
+	}
+
 	ctx.IndentedJSON(http.StatusOK, lists)
 }
 
@@ -118,10 +131,18 @@ func GetPeoples(ctx *gin.Context) {
 // @Produce json
 // @Param people_id path int true "people_id"
 // @Success 200 {object} structs.People
-// @failure 400 {string} string "error"
+// @Failure 400,404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
 // @Router /peoples/{people_id} [post]
 func GetPeoplesById(ctx *gin.Context) {
-	id := ctx.Param("id")
+
+	// take people_id from param and check To Integer Type
+	id, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		newErrorResponse(ctx, http.StatusBadRequest, "invalid id param")
+		return
+	}
 
 	var lists []structs.People
 	var list structs.People
@@ -145,7 +166,7 @@ func GetPeoplesById(ctx *gin.Context) {
 
 	rows, err := postgres.Db.Query(stmt, id)
 	if err != nil {
-		fmt.Printf("%v,rows", err)
+		newErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -178,15 +199,17 @@ func GetPeoplesById(ctx *gin.Context) {
 // @Description  Add one people
 // @Accept json
 // @Produce json
-// @Param input body structs.People true "post values"
-// @Success 200 {object} structs.People{last_name=string,first_name=string,middle_name=string}
-// @failure 400 {string} string "error"
+// @Param input body structs.PeopleToAdd true "post values"
+// @Success 201 {object} structs.PeopleToAdd
+// @Failure 400,404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
 // @Router /peoples/add [post]
 func PostPeoples(ctx *gin.Context) {
-	var newPeople structs.People
+	var newPeople structs.PeopleToAdd
 	err := ctx.BindJSON(&newPeople)
 	if err != nil {
-		log.Fatal(err)
+		newErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -194,7 +217,7 @@ func PostPeoples(ctx *gin.Context) {
 	func() {
 		_, err := postgres.Db.Query(insertPeople, newPeople.Last_name, newPeople.First_name, newPeople.Middle_name)
 		if err != nil {
-			log.Fatal(err)
+			newErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 			return
 		}
 	}()
@@ -203,7 +226,7 @@ func PostPeoples(ctx *gin.Context) {
 	func() {
 		_, err := postgres.Db.Query(insertRegistry, newPeople.Address)
 		if err != nil {
-			log.Fatal(err)
+			newErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 			return
 		}
 	}()
@@ -212,23 +235,35 @@ func PostPeoples(ctx *gin.Context) {
 }
 
 // ModifyPeoples godoc
-// @Summary      Change Address
+// @Summary      Modify People
 // @Tags Peoples
-// @Description  Add one people
+// @Description  Modify People
 // @Accept json
 // @Produce json
 // @Param input body structs.People true "post values"
 // @Success 200 {object} structs.People{last_name=string,first_name=string,middle_name=string}
-// @failure 400 {string} string "error"
+// @Failure 400,404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
 // @Router /peoples [put]
 func ModifyPeoples(ctx *gin.Context) {
+
+	// response struct
+
+	//into modifyPeople we pass JSON body (method [PUT])
 	var modifyPeople structs.People
 	err := ctx.BindJSON(&modifyPeople)
 	if err != nil {
-		log.Fatal(err)
+		newErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 
+	if _, err := strconv.Atoi(modifyPeople.ID); err != nil {
+		newErrorResponse(ctx, http.StatusBadRequest, "invalid id param")
+		return
+	}
+
+	//use squirrel to create sql Query
 	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 	var builder squirrel.UpdateBuilder
 
@@ -245,14 +280,15 @@ func ModifyPeoples(ctx *gin.Context) {
 		func() {
 			_, err := postgres.Db.Query(req, modifyPeople.Address, modifyPeople.ID)
 			if err != nil {
-				fmt.Println(err)
+				newErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 				return
 			}
 		}()
 	}
 
+	// update table People apart from Registry
 	builder = psql.Update("people")
-	args := []string{modifyPeople.Last_name, modifyPeople.Middle_name}
+
 	if modifyPeople.Last_name != "" {
 		builder = builder.Set("last_name", modifyPeople.Last_name)
 	}
@@ -267,28 +303,47 @@ func ModifyPeoples(ctx *gin.Context) {
 
 	builder = builder.Where(squirrel.Eq{"id": modifyPeople.ID})
 
-	req, _, err := builder.ToSql()
+	req, arg, err := builder.ToSql()
+
+	// send request to sql
 	func() {
-		_, err := postgres.Db.Query(req, args, modifyPeople.ID)
+		_, err := postgres.Db.Query(req, arg...)
 		if err != nil {
-			fmt.Println(err)
+			newErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 			return
 		}
 	}()
 
-	//GetPeoples(ctx)
-	//ctx.IndentedJSON(http.StatusOK, gin.H{"message": "Address for people_id: " + id + " successfully changed"})
+	// result
+
+	ctx.IndentedJSON(http.StatusOK, gin.H{"message": "changes are successful"})
 
 }
 
+// DeletePeoplesById godoc
+// @Summary      DeletePeoplesById
+// @Tags Peoples
+// @Description  DeletePeoplesById
+// @Produce json
+// @Param people_id path int true "people_id"
+// @Success 200 {string} string "people is delete"
+// @Failure 400,404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /peoples/{people_id} [delete]
 func DeletePeoplesById(ctx *gin.Context) {
-	id := ctx.Param("id")
+	// take people_id from param and check To Integer Type
+	id, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		newErrorResponse(ctx, http.StatusBadRequest, "invalid id param")
+		return
+	}
 
 	deleteRequest := "DELETE FROM People WHERE id = $1;"
 	func() {
 		_, err := postgres.Db.Query(deleteRequest, id)
 		if err != nil {
-			log.Fatal(err)
+			newErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 			return
 		}
 	}()

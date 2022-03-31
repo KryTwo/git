@@ -71,7 +71,6 @@ definitions:
 host: localhost:8888
 info:
   contact: {}
-  description: This is a piece of shit.
   title: CRUD web Server
   version: "1.0"
 paths:

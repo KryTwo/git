@@ -12,7 +12,6 @@ import (
 
 // @title           CRUD web Server
 // @version         1.0
-// @description     This is a piece of shit.
 // @host      localhost:8888
 // @BasePath  /
 func main() {

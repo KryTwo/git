@@ -1,7 +1,6 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "This is a piece of shit.",
         "title": "CRUD web Server",
         "contact": {},
         "version": "1.0"
